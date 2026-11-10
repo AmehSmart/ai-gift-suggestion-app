@@ -50,25 +50,52 @@ checkEnvironment(); // checking the evironment to return true or false
 // }
 
 // Create a string containing the prompt for the model
-const userPrompt = "Suggest some gifts for someone who loves hiphop music"
+// const userPrompt = "Suggest some gifts for someone who loves hiphop music and limit your response to 100 words"
 
 // Wrap the prompt in a message object with a user role
 
-const userMessage = {
-    role : "user",
-    content : userPrompt
-}
+// const userMessage = {
+//     role : "user",
+//     content : userPrompt
+// }
 
 
 
 
 // Send the prompt to the model as a chat completion request with 
 // a model and messages array. Await its response. 
+
+const messages = [
+ {
+        role: "user",
+      content: `Suggest some gifts for someone who loves hiphop music. 
+                Make these suggestions thoughtful and practical. Your response must be under 100 words. 
+                Skip intros and conclusions. Only output gift suggestions.`
+    }
+]
 const response = await openai.chat.completions.create(
   { 
      model: process.env.AI_MODEL,
-     messages :[userMessage]
+      messages 
+    //  max_completion_tokens : 256
     }
 )
 
-console.log(response.choices[0].message.content)
+// console.log(response.choices[0].message.content)
+
+// Storing the response 
+messages.push(response.choices[0].message)
+
+messages.push(
+    {
+        role : 'user',
+        content : "Make these suggestions more budget friendly and under $40."
+    }
+)
+
+const followUpResponse = await openai.chat.completions.create({
+    model : process.env.AI_MODEL,
+    messages
+})
+
+console.log(followUpResponse.choices[0].message.content)
